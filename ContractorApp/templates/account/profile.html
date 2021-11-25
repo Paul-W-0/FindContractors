@@ -1,0 +1,6 @@
+{% if user.is_authenticated %}
+{% for item in context %}
+{{ item.about_me }}
+{{ item.experience }}
+{% endfor %}
+{% endif %}
