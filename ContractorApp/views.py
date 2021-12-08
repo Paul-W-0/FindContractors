@@ -1,12 +1,12 @@
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from .models import Profile
+from .models import Contractor, Profile
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from .forms import ContractorSignUpForm, UserTypeForm, WorkSignUpForm, ProfileSetup
 from django.contrib.auth import logout
 from .forms import ProfileSetup
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 @login_required
 def home(request):
     return render(request, 'home.html', {  } )
@@ -34,9 +34,10 @@ def signup_contractor_finish(request):
         if signup_form.is_valid():
             save_form = signup_form.save()
             save_form.save()
+            get_user = User.objects.all().last()
+            Contractor.objects.create(user=get_user, is_a_contractor=True)
             return HttpResponseRedirect('/login/')
         else:
-            # print(form.errors)
             return HttpResponse('We encountered a problem when processing your request, please check you information and try again.')
     else:
         form = ContractorSignUpForm
@@ -48,9 +49,10 @@ def signup_company_finish(request):
         if signup_form.is_valid():
             save_form = signup_form.save()
             save_form.save()
+            get_user = User.objects.all().last()
+            Contractor.objects.create(user=get_user, is_a_contractor=False)
             return HttpResponseRedirect('/login/')
         else:
-            # print(form.errors)
             return HttpResponse('We encountered a problem when processing your request, please check your information and try again.')
     else:
         form = WorkSignUpForm
@@ -68,18 +70,19 @@ def setup_profile(request):
     obj = Profile.objects.filter(user=request.user)
     if obj.exists():
         return HttpResponseRedirect('/update_profile/')
-    if request.method == 'POST':
-        form = ProfileSetup(request.POST)
-        if form.is_valid:
-            save_form = form.save()
-            save_form.user = request.user
-            save_form.save()
-            return HttpResponseRedirect('/profile/')
-        else:
-            return HttpResponse('There was a problem proccessing your request!')
     else:
-        form = ProfileSetup
-        return render(request, 'account/profile_setup.html', { 'form':form } )
+        if request.method == 'POST':
+            form = ProfileSetup(request.POST)
+            if form.is_valid:
+                save_form = form.save()
+                save_form.user = request.user
+                save_form.save()
+                return HttpResponseRedirect('/profile/')
+            else:
+                return HttpResponse('There was a problem proccessing your request!')
+        else:
+            form = ProfileSetup
+            return render(request, 'account/profile_setup.html', { 'form':form } )
 @csrf_protect
 @login_required
 def update_profile(request):
