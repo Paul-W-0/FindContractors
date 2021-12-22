@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.widgets import PasswordInput, RadioSelect
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, Job
 from django.contrib.auth.forms import UserCreationForm as UserCreationForm
 class UserTypeForm(forms.Form):
     choice_type = forms.ChoiceField(widget=RadioSelect, choices=( ( 1, 'Im a Contractor' ), ( 2, 'Looking for a Contractor' ) ), required=True)
@@ -34,3 +34,9 @@ class ProfileSetup(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ( 'experience', 'about_me' )
+class JobCreationForm(forms.ModelForm):
+    choice = ( (1, 'Construction'), (2, 'Security'), (3, 'Information Technology'), (4, 'Retail'), (5, 'Warehouse'), (6, 'Online Only') )
+    job_type = forms.ChoiceField(choices=choice)
+    class Meta:
+        model = Job
+        fields = ('title', 'description', 'job_type', 'work_duties', 'preferred_certifications', 'minimum_qualifications')

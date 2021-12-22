@@ -11,6 +11,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('profile_modification/', views.setup_profile, name='setup_profile'),
     path('update_profile/', views.update_profile, name='update_profile'),
+    path('jobs/create/', views.job_create, name="job_create"),
     # Password Reset Links: 
     path('password_reset/', PasswordResetView.as_view(
         template_name='account/password_reset.html',
