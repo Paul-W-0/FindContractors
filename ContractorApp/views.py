@@ -1,11 +1,12 @@
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
-from .models import Contractor, Job, Profile
+from .models import Contractor, Job, Profile, SecurityReport
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
-from .forms import ContractorSignUpForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm
-from django.contrib.auth import logout
+from .forms import ContractorSignUpForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
+from django.contrib.auth import  logout
 from django.contrib.auth.models import User
+from django.core import mail
 @login_required
 def home(request):
     try:
@@ -17,6 +18,8 @@ def home(request):
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
             jobcontext = Job.objects.all()
             return render(request, 'home.html', { 'jobcontext':jobcontext, } )
+        elif User.is_superuser or User.is_staff:
+            return HttpResponseRedirect('/security/reports/')
         else:
             return HttpResponseBadRequest()
 @csrf_protect
@@ -125,3 +128,34 @@ def job_create(request):
     except Contractor.DoesNotExist:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
             return HttpResponseForbidden()
+@csrf_protect
+@login_required
+def report_security_problem(request):
+    if request.method == 'POST':
+        form = SecurityReportForm(request.POST)
+        if form.is_valid():
+            form.save()
+            connection = mail.get_connection()
+            connection.open()
+            email = mail.EmailMessage(
+                'A Thank You from the Find.Contractors Team!',
+                'We appreciate your submission to helping build a safer community in the online world!',
+                '', # Need to add a company email here
+                request.user.email,
+                connection=connection
+            )
+            email.send()
+            connection.close()
+            return HttpResponseRedirect('/')
+        else:
+            return HttpResponse('Please make sure all required fields are filled out properly.')
+    else:
+        form = SecurityReportForm()
+        return render(request, 'report_security.html', { 'form':form, } )
+@login_required
+def reports(request):
+    if User.is_staff == True or User.is_superuser:
+        context = SecurityReport.objects.all()
+        return render(request, 'security_reports.html', { 'context':context, } )
+    else:
+        return HttpResponseForbidden()

@@ -13,3 +13,9 @@ class Job(models.Model):
     work_duties = models.TextField()
     preferred_certifications = models.TextField()
     minimum_qualifications = models.TextField()
+class SecurityReport(models.Model):
+    title = models.CharField(max_length=110)
+    description = models.TextField()
+    explanation = models.TextField()
+    steps_to_reproduce = models.TextField()
+    
