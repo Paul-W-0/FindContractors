@@ -20,7 +20,7 @@
 
 
 
-### While we appreciate your interest in finding bugs in this web
-application we are not currently paying the ethical hacker for
+### While we value your interest in finding bugs in this web application
+We are not currently paying the ethical hacker for
 finding the vulnerabilities. By contributing your findings you acknowledge
 that you will not be paid for the bounty that you found.
