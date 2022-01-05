@@ -1,6 +1,28 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<h4 class="ui secondary block header">
+  <div class="ui orange basic label">
+    Find.Contractors
+  </div>
+  <a href="/profile/" class="ui button">My Account</a>
+  {% if query %}
+    <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
+  {% endif %}
+    <a href="/logout/" class="ui standard button">Sign Out</a>
+</h4>
 {% if user.is_authenticated %}
-{% for item in context %}
-{{ item.about_me }}
-{{ item.experience }}
-{% endfor %}
+    {% for item in context %}
+        <div class="ui placeholder segment">
+            <div class="ui header">
+                <center>
+                    {{ request.user }}<br />
+                    {{ item.about_me }}<br />
+                    {{ item.experience }}<br />
+                </center>
+                <div class="inline">
+                    <a href="/update_profile/" class="ui primary button">Update Profile</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 {% endif %}

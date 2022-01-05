@@ -4,14 +4,15 @@ from .models import Contractor, Job, Profile, SecurityReport
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from .forms import ContractorSignUpForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
-from django.contrib.auth import  logout
+from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core import mail
 @login_required
 def home(request):
     try:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
-            return render(request, 'home.html', {  } )
+            query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
+            return render(request, 'home.html', { 'query':query, } )
         else:
             return HttpResponseBadRequest()
     except Contractor.DoesNotExist:
@@ -74,8 +75,13 @@ def logout_view(request):
     return HttpResponseRedirect('/login/')
 @login_required
 def profile(request):
-    context = Profile.objects.filter(user=request.user)
-    return render(request, 'account/profile.html', { 'context':context } )
+    try:
+        query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
+        context = Profile.objects.filter(user=request.user)
+        return render(request, 'account/profile.html', { 'context':context, 'query':query, } )
+    except Contractor.DoesNotExist:
+        context = Profile.objects.filter(user=request.user)
+        return render(request, 'account/profile.html', { 'context':context, } )
 @csrf_protect
 @login_required
 def setup_profile(request):
