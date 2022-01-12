@@ -12,6 +12,17 @@
 </h4>
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+    <h5>Title</h5>
+    {{ form.title }}<br />
+    <h5>Description</h5>
+    {{ form.description }}<br />
+    <h5>Job Type</h5>
+    {{ form.job_type }}<br />
+    <h5>Work Duties</h5>
+    {{ form.work_duties }}<br />
+    <h5>Preferred Certifications</h5>
+    {{ form.preferred_certifications }}<br />
+    <h5>Minimum Certifications</h5>
+    {{ form.minimum_qualifications }}<br />
     <input type="submit" />
 </form>

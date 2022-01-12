@@ -12,6 +12,7 @@ urlpatterns = [
     path('profile_modification/', views.setup_profile, name='setup_profile'),
     path('update_profile/', views.update_profile, name='update_profile'),
     path('jobs/create/', views.job_create, name="job_create"),
+    path('jobs/apply/<slug:slug>', views.job_apply, name='job_apply'),
     # Security Vulnerability Report Links:
     path('security/', views.report_security_problem, name='report_security_problem'),
     path('security/reports/', views.reports, name='reports'),

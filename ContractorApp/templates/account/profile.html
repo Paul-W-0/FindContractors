@@ -25,4 +25,7 @@
             </div>
         </div>
     {% endfor %}
+    {% for job in jobs_listed %}
+        {{ job.title }}<br />
+    {% endfor %}
 {% endif %}

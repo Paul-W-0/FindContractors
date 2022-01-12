@@ -1,12 +1,14 @@
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Contractor, Job, Profile, SecurityReport
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
-from .forms import ContractorSignUpForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
+from .forms import ContractorSignUpForm, JobApplicationForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core import mail
+from django.db import IntegrityError
+@csrf_protect
 @login_required
 def home(request):
     try:
@@ -78,7 +80,8 @@ def profile(request):
     try:
         query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
         context = Profile.objects.filter(user=request.user)
-        return render(request, 'account/profile.html', { 'context':context, 'query':query, } )
+        jobs_listed = Job.objects.all().filter(employer=request.user)
+        return render(request, 'account/profile.html', { 'context':context, 'query':query, 'jobs_listed':jobs_listed, } )
     except Contractor.DoesNotExist:
         context = Profile.objects.filter(user=request.user)
         return render(request, 'account/profile.html', { 'context':context, } )
@@ -91,7 +94,7 @@ def setup_profile(request):
     else:
         if request.method == 'POST':
             form = ProfileSetup(request.POST)
-            if form.is_valid:
+            if form.is_valid():
                 save_form = form.save()
                 save_form.user = request.user
                 save_form.save()
@@ -123,11 +126,17 @@ def job_create(request):
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
             if request.method == "POST":
                 form = JobCreationForm(request.POST)
-                if form.is_valid():
-                    form.save()
-                    return HttpResponseRedirect('/')
-                else:
-                    return HttpResponse('Please check your information, and try again!')
+                try:
+                    if form.is_valid():
+                        save_form = form.save()
+                        save_form.slug = form.cleaned_data.get('title') + form.cleaned_data.get('job_type')
+                        save_form.employer = request.user
+                        save_form.save()
+                        return HttpResponseRedirect('/')
+                    else:
+                        return HttpResponse('Please check your information, and try again!')
+                except IntegrityError: # In case the job slug is the same as another job's slug, then raise an error.
+                    return HttpResponse('A job opening with that title already exists, please change the title.')
             else:
                 form = JobCreationForm()
                 return render(request, 'job_create.html', { 'form':form, } )
@@ -165,3 +174,25 @@ def reports(request):
         return render(request, 'security_reports.html', { 'context':context, } )
     else:
         return HttpResponseForbidden()
+@csrf_protect
+@login_required
+def job_apply(request, slug):
+    try:
+        if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
+            return HttpResponseForbidden()
+        else:
+            return HttpResponseBadRequest()
+    except Contractor.DoesNotExist:
+        if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
+            if request.method == "POST":
+                form = JobCreationForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                return HttpResponse('You have successfully applied for this position!')
+            else:
+                query = Job.objects.all()
+                slug_from_job = get_object_or_404(Job, slug=slug)
+                form = JobApplicationForm
+                return render(request, 'job_apply.html', { 'query':query, 'slug_from_job':slug_from_job, 'form':form, } )
+        else:
+            return HttpResponseBadRequest()

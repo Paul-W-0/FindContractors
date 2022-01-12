@@ -5,16 +5,10 @@
     Find.Contractors
   </div>
   <a href="/profile/" class="ui button">My Account</a>
-  {% if query %}
-    <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
-  {% endif %}
     <a href="/logout/" class="ui standard button">Sign Out</a>
 </h4>
-{% for jobcontext in jobcontext %}
-  <div class="ui primary message">
-    <div class="header">
-        <a href="{% url 'job_apply' jobcontext.slug %}">{{ jobcontext.title }}</a>
-    </div>
-    {{ jobcontext.work_duties }}
-  </div>
-{% endfor %}
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" />
+</form>
