@@ -11,20 +11,18 @@ from django.db import IntegrityError
 @csrf_protect
 @login_required
 def home(request):
-    try:
-        if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
-            query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
-            return render(request, 'home.html', { 'query':query, } )
-    except Contractor.DoesNotExist:
-        if User.is_superuser or User.is_staff:
-            pass
-        else:
-            contractor_query = Contractor.objects.filter(user=request.user).get(is_a_contractor=True)
-            if contractor_query:
-                jobcontext = Job.objects.all()
-                return render(request, 'home.html', { 'jobcontext':jobcontext, } )
-    if User.is_superuser or User.is_staff:
+    if request.user.is_superuser == True or request.user.is_staff == True:
         return HttpResponseRedirect('/security/reports/')
+    else:
+        try:
+            if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
+                query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
+                return render(request, 'home.html', { 'query':query, } )
+        except Contractor.DoesNotExist:
+                contractor_query = Contractor.objects.filter(user=request.user).get(is_a_contractor=True)
+                if contractor_query:
+                    jobcontext = Job.objects.all()
+                    return render(request, 'home.html', { 'jobcontext':jobcontext, } )
 @csrf_protect
 def signup(request):
     if request.method == 'POST':
@@ -169,7 +167,7 @@ def report_security_problem(request):
         return render(request, 'report_security.html', { 'form':form, } )
 @login_required
 def reports(request):
-    if User.is_staff == True or User.is_superuser:
+    if request.user.is_staff == True or request.user.is_superuser == True:
         context = SecurityReport.objects.all()
         return render(request, 'security_reports.html', { 'context':context, } )
     else:
