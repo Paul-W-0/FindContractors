@@ -185,7 +185,7 @@ def job_apply(request, slug):
     except Contractor.DoesNotExist:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
             if request.method == "POST":
-                form = JobCreationForm(request.POST)
+                form = JobApplicationForm(request.POST)
                 if form.is_valid():
                     form.save()
                 return HttpResponse('You have successfully applied for this position!')
