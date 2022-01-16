@@ -15,16 +15,16 @@ def home(request):
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
             query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
             return render(request, 'home.html', { 'query':query, } )
-        else:
-            return HttpResponseBadRequest()
     except Contractor.DoesNotExist:
-        if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
-            jobcontext = Job.objects.all()
-            return render(request, 'home.html', { 'jobcontext':jobcontext, } )
-        elif User.is_superuser or User.is_staff:
-            return HttpResponseRedirect('/security/reports/')
+        if User.is_superuser or User.is_staff:
+            pass
         else:
-            return HttpResponseBadRequest()
+            contractor_query = Contractor.objects.filter(user=request.user).get(is_a_contractor=True)
+            if contractor_query:
+                jobcontext = Job.objects.all()
+                return render(request, 'home.html', { 'jobcontext':jobcontext, } )
+    if User.is_superuser or User.is_staff:
+        return HttpResponseRedirect('/security/reports/')
 @csrf_protect
 def signup(request):
     if request.method == 'POST':
@@ -156,7 +156,7 @@ def report_security_problem(request):
                 'A Thank You from the Find.Contractors Team!',
                 'We appreciate your submission to helping build a safer community in the online world!',
                 '', # Need to add a company email here
-                request.user.email,
+                [ request.user.email ],
                 connection=connection
             )
             email.send()
