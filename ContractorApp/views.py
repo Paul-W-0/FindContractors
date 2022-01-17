@@ -133,7 +133,11 @@ def job_create(request):
                         return HttpResponseRedirect('/')
                     else:
                         return HttpResponse('Please check your information, and try again!')
-                except IntegrityError: # In case the job slug is the same as another job's slug, then raise an error.
+                except IntegrityError:
+                    none_query = Job.objects.filter(slug=None)
+                    if none_query:
+                        for job in none_query:
+                            job.delete()
                     return HttpResponse('A job opening with that title already exists, please change the title.')
             else:
                 form = JobCreationForm()
