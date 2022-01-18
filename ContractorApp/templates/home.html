@@ -18,3 +18,10 @@
     {{ jobcontext.work_duties }}
   </div>
 {% endfor %}
+{% if query %}
+  {% for job in job_query %}
+    {{ job.contractor_name }}
+    {{ job.contractor_email }}
+    {{ job.contractor_experience }}
+  {% endfor %}
+{% endif %}

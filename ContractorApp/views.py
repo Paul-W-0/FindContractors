@@ -16,8 +16,9 @@ def home(request):
     else:
         try:
             if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
-                query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
-                return render(request, 'home.html', { 'query':query, } )
+                contractor_user_query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
+                job_query = Job.objects.filter(employer=request.user).all()
+                return render(request, 'home.html', { 'query':contractor_user_query, 'job_query':job_query, } )
         except Contractor.DoesNotExist:
                 contractor_query = Contractor.objects.filter(user=request.user).get(is_a_contractor=True)
                 if contractor_query:
@@ -187,9 +188,18 @@ def job_apply(request, slug):
     except Contractor.DoesNotExist:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
             if request.method == "POST":
+                url = request.path
+                slug_from_url = url.split('/jobs/apply/')
                 form = JobApplicationForm(request.POST)
                 if form.is_valid():
-                    form.save()
+                    save_form = form.save()
+                    save_form.name = form.cleaned_data.get('name')
+                    save_form.email = form.cleaned_data.get('email')
+                    save_form.related_experience = form.cleaned_data.get('related_experience')
+                    save_form.save()
+                    Job.objects.update(contractor_name=save_form.name)
+                    Job.objects.update(contractor_email=save_form.email)
+                    Job.objects.update(contractor_experience=save_form.related_experience)
                 return HttpResponse('You have successfully applied for this position!')
             else:
                 query = Job.objects.all()
