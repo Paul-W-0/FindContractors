@@ -47,7 +47,7 @@ class SecurityReportForm(forms.ModelForm):
 class JobApplicationForm(forms.ModelForm):
     class Meta:
         model = JobApplication
-        fields = ('name', 'email', 'related_experience')
+        fields = ('name', 'related_experience')
 class DeleteJobForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")

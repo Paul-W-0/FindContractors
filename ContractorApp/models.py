@@ -25,5 +25,4 @@ class SecurityReport(models.Model):
     steps_to_reproduce = models.TextField()
 class JobApplication(models.Model):
     name = models.CharField(max_length=175)
-    email = models.EmailField()
     related_experience = models.TextField()

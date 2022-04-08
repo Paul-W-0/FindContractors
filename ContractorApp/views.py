@@ -205,6 +205,17 @@ def job_apply(request, slug):
                     Job.objects.update(contractor_name=save_form.name)
                     Job.objects.update(contractor_email=save_form.email)
                     Job.objects.update(contractor_experience=save_form.related_experience)
+                    connection = mail.get_connection()
+                    connection.open()
+                    email = mail.EmailMessage(
+                        'You have successfully applied for a job!',
+                        'We would like to wish you the best of luck!',
+                        '', # Need to add a company email here
+                        [ request.user.email ],
+                        connection=connection
+                    )
+                email.send()
+                connection.close()
                 return HttpResponse('You have successfully applied for this position!')
             else:
                 query = Job.objects.all()
