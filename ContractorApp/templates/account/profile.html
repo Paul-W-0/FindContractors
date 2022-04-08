@@ -25,6 +25,10 @@
             </div>
         </div>
     {% endfor %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}<br />
+        <button type="submit">Delete Selected Job</button><br />
     {% for job in jobs_listed %}
         {{ job.title }}<br />
     {% endfor %}

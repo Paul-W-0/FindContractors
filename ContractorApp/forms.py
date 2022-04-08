@@ -48,3 +48,11 @@ class JobApplicationForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = ('name', 'email', 'related_experience')
+class DeleteJobForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(DeleteJobForm, self).__init__(*args, **kwargs)
+        self.fields["title"].queryset = Job.objects.filter(employer=self.request.user).values_list('slug', 'title')
+    class Meta:
+        model = Job
+        fields = ('title', )

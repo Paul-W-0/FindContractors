@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Contractor, Job, Profile, SecurityReport
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
-from .forms import ContractorSignUpForm, JobApplicationForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
+from .forms import ContractorSignUpForm, DeleteJobForm, JobApplicationForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core import mail
@@ -80,7 +80,14 @@ def profile(request):
         query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
         context = Profile.objects.filter(user=request.user)
         jobs_listed = Job.objects.all().filter(employer=request.user)
-        return render(request, 'account/profile.html', { 'context':context, 'query':query, 'jobs_listed':jobs_listed, } )
+        if request.method == "POST":
+            form = DeleteJobForm(request.POST, request=request)
+            job_query = Job.objects.filter(employer=request.user).get(title=request.POST.get('title'))
+            job_query.delete()
+            return HttpResponse('The job you selected has been deleted.')
+        else:
+            form = DeleteJobForm(request=request)
+            return render(request, 'account/profile.html', { 'context':context, 'query':query, 'jobs_listed':jobs_listed, 'form':form, } )
     except Contractor.DoesNotExist:
         context = Profile.objects.filter(user=request.user)
         return render(request, 'account/profile.html', { 'context':context, } )
@@ -128,7 +135,7 @@ def job_create(request):
                 try:
                     if form.is_valid():
                         save_form = form.save()
-                        save_form.slug = form.cleaned_data.get('title') + form.cleaned_data.get('job_type')
+                        save_form.slug = str(request.user.id) + form.cleaned_data.get('title').replace(" ", "") + form.cleaned_data.get('job_type')
                         save_form.employer = request.user
                         save_form.save()
                         return HttpResponseRedirect('/')
@@ -188,8 +195,6 @@ def job_apply(request, slug):
     except Contractor.DoesNotExist:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
             if request.method == "POST":
-                url = request.path
-                slug_from_url = url.split('/jobs/apply/')
                 form = JobApplicationForm(request.POST)
                 if form.is_valid():
                     save_form = form.save()
