@@ -4,14 +4,90 @@
   <div class="ui orange basic label">
     Find.Contractors
   </div>
-  <a href="/profile/" class="ui button">My Account</a>
-  {% if query %}
-    <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
+  {% if user.is_authenticated %}
+    <a href="/profile/" class="ui button">My Account</a>
+    {% if query %}
+      <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
+    {% endif %}
+      <a href="/logout/" class="ui standard button">Sign Out</a>
+  {% else %}
+    <a href="/login/" class="ui standard button">Login</a>
   {% endif %}
-    <a href="/logout/" class="ui standard button">Sign Out</a>
 </h4>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" />
-</form>
+{% if user.is_authenticated %}
+  You are already signed in to an account
+{% else %}
+<div class="ui placeholder segment">
+  <div class="ui two column grid">
+    <div class="column">
+      <div class="ui icon header">
+        <i class="user icon"></i>
+        <p>What are you here for?</p>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.choice_type }}
+        <input type="submit" />
+      </form>
+    </div>
+    <div class="column">
+      <div class="ui placeholder segment">
+        <div class="ui two column grid">
+          <div class="column">
+            <div class="ui card">
+              <div class="content">
+                <div class="header">
+                  Who is this website made for, and what is it's purpose?
+                </div>
+                <div class="description">
+                  Find.contractors was made for employers, and contractors to connect with eachother, and perform contracting work locally, and internationally. 
+                  <hr />
+                  Find.Contractors was made to assist employers, and contractors (independant and non-independant), with either finding, employing, and/or conducting contract work.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="ui card">
+              <div class="content">
+                <div class="header">
+                  Why choose Find.Contractors over a competitor?
+                </div>
+                <div class="description">
+                  This website offers functinoality that you will have trouble finding at other competing websites such as a chat service for the contractor to communicate with the company they are doing their work for.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ui vertical divider"></div>
+  </div>
+</div>
+{% endif %}
+<footer style="position: fixed; bottom: 0; width: 100%;" class="ui secondary block header">
+  <center>
+    <div class="ui three column grid">
+      <div class="column">
+        <strong>
+          Find.Contractors
+        </strong>
+      </div>
+      <div class="column">
+        {% if user.is_authenticated %}
+          <a href="/profile/" class="ui button">My Account</a>
+          {% if query %}
+            <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
+          {% endif %}
+            <a href="/logout/" class="ui standard button">Sign Out</a>
+        {% else %}
+          <a href="/login/" class="ui standard button">Login</a>
+        {% endif %}
+      </div>
+      <div class="column">
+        <strong class="ui right aligned text">&copy; Find.Contractors</strong>
+      </div>
+    </div>
+  </center>
+</footer>

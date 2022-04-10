@@ -56,3 +56,11 @@ class DeleteJobForm(forms.ModelForm):
     class Meta:
         model = Job
         fields = ('title', )
+class HireContractorForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(HireContractorForm, self).__init__(*args, **kwargs)
+        self.fields["chosen_contractor_name"].queryset = Job.objects.filter(employer=self.request.user).values_list('chosen_contractor_name', )
+    class Meta:
+        model = Job
+        fields = ('chosen_contractor_name', )

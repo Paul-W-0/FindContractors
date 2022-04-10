@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Contractor, Job, Profile, SecurityReport
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
-from .forms import ContractorSignUpForm, DeleteJobForm, JobApplicationForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
+from .forms import ContractorSignUpForm, DeleteJobForm, HireContractorForm, JobApplicationForm, UserTypeForm, WorkSignUpForm, ProfileSetup, JobCreationForm, SecurityReportForm
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core import mail
@@ -18,7 +18,19 @@ def home(request):
             if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
                 contractor_user_query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
                 job_query = Job.objects.filter(employer=request.user).all()
-                return render(request, 'home.html', { 'query':contractor_user_query, 'job_query':job_query, } )
+                if request.method == "POST":
+                    form = HireContractorForm(request.POST, request=request)
+                    if form.is_valid():
+                        save_form = form.save()
+                        save_form.contractor_name = form.cleaned_data.get('chosen_contractor_name')
+                        save_form.save()
+                        Job.objects.update(chosen_contractor_name=save_form.contractor_name)
+                        return render(request, 'home.html', { 'query':contractor_user_query, 'job_query':job_query, 'form':form, } )
+                    else:
+                        return HttpResponse('Please make sure all fields are filled out properly, and try again.')
+                else:
+                    form = HireContractorForm(request=request)
+                    return render(request, 'home.html', { 'query':contractor_user_query, 'job_query':job_query, 'form':form, } )
         except Contractor.DoesNotExist:
                 contractor_query = Contractor.objects.filter(user=request.user).get(is_a_contractor=True)
                 if contractor_query:
@@ -199,11 +211,9 @@ def job_apply(request, slug):
                 if form.is_valid():
                     save_form = form.save()
                     save_form.name = form.cleaned_data.get('name')
-                    save_form.email = form.cleaned_data.get('email')
                     save_form.related_experience = form.cleaned_data.get('related_experience')
                     save_form.save()
                     Job.objects.update(contractor_name=save_form.name)
-                    Job.objects.update(contractor_email=save_form.email)
                     Job.objects.update(contractor_experience=save_form.related_experience)
                     connection = mail.get_connection()
                     connection.open()

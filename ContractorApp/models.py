@@ -16,8 +16,8 @@ class Job(models.Model):
     minimum_qualifications = models.TextField()
     slug = models.SlugField(unique=True, blank=True, null=True)
     contractor_name = models.CharField(max_length=175, default='')
-    contractor_email = models.EmailField(null=True)
     contractor_experience = models.TextField(null=True)
+    chosen_contractor_name = models.CharField(max_length=175, default='')
 class SecurityReport(models.Model):
     title = models.CharField(max_length=110)
     description = models.TextField()

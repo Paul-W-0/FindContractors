@@ -5,23 +5,28 @@
     Find.Contractors
   </div>
   <a href="/profile/" class="ui button">My Account</a>
-  {% if query %}
+  {% if query %} <!-- Checks the user type (contractor or employer) -->
     <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
   {% endif %}
     <a href="/logout/" class="ui standard button">Sign Out</a>
 </h4>
-{% for jobcontext in jobcontext %}
-  <div class="ui primary message">
-    <div class="header">
-        <a href="{% url 'job_apply' jobcontext.slug %}">{{ jobcontext.title }}</a>
+{% if not query %}
+  {% for jobcontext in jobcontext %}
+    <div class="ui primary message">
+      <div class="header">
+          <a href="{% url 'job_apply' jobcontext.slug %}">{{ jobcontext.title }}</a>
+      </div>
+      {{ jobcontext.work_duties }}
     </div>
-    {{ jobcontext.work_duties }}
-  </div>
-{% endfor %}
+  {% endfor %}
+{% endif %}
 {% if query %}
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}<br />
+    <button type="submit">Select this User</button><br />
   {% for job in job_query %}
     {{ job.contractor_name }}
-    {{ job.contractor_email }}
     {{ job.contractor_experience }}
   {% endfor %}
 {% endif %}
