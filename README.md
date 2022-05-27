@@ -10,3 +10,4 @@
 - Currently I'm using the console backend for emailing because I don't want to get emailed every single time I'm testing a specific feature to see if it works or not.
 - Anyone who is familiar with Python, and Django is welcome to contribute to this repository.
 - This is not a published website, and is still in heavy development.
+- If this website is ever published then all security keys and such will be regenerated.
