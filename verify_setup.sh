@@ -1,5 +1,6 @@
 #!/bin/bash
 # Verification script to check if the Django environment is set up correctly
+set -e
 
 echo "=== Django Environment Verification ==="
 echo ""
