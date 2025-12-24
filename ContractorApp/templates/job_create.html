@@ -1,28 +1,84 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-<h4 class="ui secondary block header">
-  <div class="ui orange basic label">
-    Find.Contractors
-  </div>
-  <a href="/profile/" class="ui button">My Account</a>
-  {% if query %}
-    <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
-  {% endif %}
-    <a href="/logout/" class="ui standard button">Sign Out</a>
-</h4>
-<form method="POST">
-    {% csrf_token %}
-    <h5>Title</h5>
-    {{ form.title }}<br />
-    <h5>Description</h5>
-    {{ form.description }}<br />
-    <h5>Job Type</h5>
-    {{ form.job_type }}<br />
-    <h5>Work Duties</h5>
-    {{ form.work_duties }}<br />
-    <h5>Preferred Certifications</h5>
-    {{ form.preferred_certifications }}<br />
-    <h5>Minimum Certifications</h5>
-    {{ form.minimum_qualifications }}<br />
-    <input type="submit" />
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post New Job - Find.Contractors</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <style>
+        body { background-color: #f5f5f5; }
+        .form-container { min-height: 80vh; padding-top: 20px; padding-bottom: 60px; }
+    </style>
+</head>
+<body>
+    <div class="ui inverted menu">
+        <div class="ui container">
+            <a href="/" class="header item">
+                <i class="users icon"></i>
+                Find.Contractors
+            </a>
+            <div class="right menu">
+                <a href="/profile/" class="item"><i class="user icon"></i> My Account</a>
+                {% if query %}
+                    <a href="/jobs/create/" class="item active"><i class="plus icon"></i> Post a New Job</a>
+                {% endif %}
+                <a href="/logout/" class="item"><i class="sign out icon"></i> Sign Out</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui container form-container">
+        <div class="ui centered grid">
+            <div class="twelve wide column">
+                <div class="ui raised segment">
+                    <h2 class="ui header">
+                        <i class="plus circle icon"></i>
+                        <div class="content">
+                            Post a New Job Opening
+                            <div class="sub header">Fill in the details to create a new job listing</div>
+                        </div>
+                    </h2>
+                    <div class="ui divider"></div>
+                    <form method="POST" class="ui form">
+                        {% csrf_token %}
+                        <div class="field">
+                            <label><i class="tag icon"></i> Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="field">
+                            <label><i class="align left icon"></i> Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="field">
+                            <label><i class="briefcase icon"></i> Job Type</label>
+                            {{ form.job_type }}
+                        </div>
+                        <div class="field">
+                            <label><i class="tasks icon"></i> Work Duties</label>
+                            {{ form.work_duties }}
+                        </div>
+                        <div class="field">
+                            <label><i class="certificate icon"></i> Preferred Certifications</label>
+                            {{ form.preferred_certifications }}
+                        </div>
+                        <div class="field">
+                            <label><i class="star icon"></i> Minimum Qualifications</label>
+                            {{ form.minimum_qualifications }}
+                        </div>
+                        <button type="submit" class="ui primary fluid large button">
+                            <i class="paper plane icon"></i>
+                            Post Job
+                        </button>
+                        <a href="/profile/" class="ui button fluid" style="margin-top: 10px;">
+                            <i class="arrow left icon"></i>
+                            Cancel
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

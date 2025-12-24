@@ -1,20 +1,90 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-<h4 class="ui secondary block header">
-  <div class="ui orange basic label">
-    Find.Contractors
-  </div>
-  <a href="/profile/" class="ui button">My Account</a>
-  {% if query %}
-    <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
-  {% endif %}
-    <a href="/logout/" class="ui standard button">Sign Out</a>
-</h4>
-{% for report in context %}
-<div class="ui segment">
-  <h3>{{ report.title|escape }}</h3>
-  <p><strong>Description:</strong> {{ report.description|escape }}</p>
-  <p><strong>Explanation:</strong> {{ report.explanation|escape }}</p>
-  <p><strong>Steps to Reproduce:</strong> {{ report.steps_to_reproduce|escape|linebreaks }}</p>
-</div>
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Reports - Find.Contractors</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <style>
+        body { background-color: #f5f5f5; }
+        .main-container { min-height: 80vh; padding-top: 20px; padding-bottom: 60px; }
+    </style>
+</head>
+<body>
+    <div class="ui inverted menu">
+        <div class="ui container">
+            <a href="/" class="header item">
+                <i class="users icon"></i>
+                Find.Contractors
+            </a>
+            <div class="right menu">
+                <a href="/profile/" class="item"><i class="user icon"></i> My Account</a>
+                {% if query %}
+                    <a href="/jobs/create/" class="item"><i class="plus icon"></i> Post a New Job</a>
+                {% endif %}
+                <a href="/logout/" class="item"><i class="sign out icon"></i> Sign Out</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui container main-container">
+        <h2 class="ui header">
+            <i class="shield alternate icon"></i>
+            <div class="content">
+                Security Reports
+                <div class="sub header">View all submitted security vulnerability reports</div>
+            </div>
+        </h2>
+        <div class="ui divider"></div>
+
+        {% if context %}
+            {% for report in context %}
+                <div class="ui raised card" style="width: 100%; margin-bottom: 20px;">
+                    <div class="content">
+                        <div class="header">
+                            <i class="bug icon"></i>
+                            {{ report.title|escape }}
+                        </div>
+                        <div class="meta">
+                            <span class="date">Security Vulnerability Report</span>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <h4 class="ui sub header">
+                            <i class="info circle icon"></i>
+                            Description
+                        </h4>
+                        <p>{{ report.description|escape }}</p>
+                        
+                        <div class="ui divider"></div>
+                        
+                        <h4 class="ui sub header">
+                            <i class="comment alternate icon"></i>
+                            Explanation
+                        </h4>
+                        <p>{{ report.explanation|escape }}</p>
+                        
+                        <div class="ui divider"></div>
+                        
+                        <h4 class="ui sub header">
+                            <i class="list ol icon"></i>
+                            Steps to Reproduce
+                        </h4>
+                        <div class="ui message">{{ report.steps_to_reproduce|escape|linebreaks }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="ui icon message">
+                <i class="shield alternate icon"></i>
+                <div class="content">
+                    <div class="header">No security reports found</div>
+                    <p>All security reports will appear here.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

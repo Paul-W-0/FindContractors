@@ -1,25 +1,82 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-<h4 class="ui secondary block header">
-  <div class="ui orange basic label">
-    Find.Contractors
-  </div>
-  {% if user.is_authenticated %}
-    <a href="/profile/" class="ui button">My Account</a>
-  {% endif %}
-  {% if query %}
-    <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
-  {% endif %}
-  {% if user.is_authenticated %}
-    <a href="/logout/" class="ui standard button">Sign Out</a>
-  {% endif %}
-</h4>
-{% if user.is_authenticated %}
-<p>You're already logged in</p>
-{% else %}
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" />
-</form>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Find.Contractors</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <style>
+        body { background-color: #f5f5f5; }
+        .form-container { min-height: 80vh; padding-top: 60px; padding-bottom: 60px; }
+    </style>
+</head>
+<body>
+    <div class="ui inverted menu">
+        <div class="ui container">
+            <a href="/" class="header item">
+                <i class="users icon"></i>
+                Find.Contractors
+            </a>
+            <div class="right menu">
+                {% if user.is_authenticated %}
+                    <a href="/profile/" class="item"><i class="user icon"></i> My Account</a>
+                    {% if query %}
+                        <a href="/jobs/create/" class="item"><i class="plus icon"></i> Post a New Job</a>
+                    {% endif %}
+                    <a href="/logout/" class="item"><i class="sign out icon"></i> Sign Out</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="ui container form-container">
+        <div class="ui centered grid">
+            <div class="eight wide column">
+                {% if user.is_authenticated %}
+                    <div class="ui positive icon message">
+                        <i class="check circle icon"></i>
+                        <div class="content">
+                            <div class="header">Already Logged In</div>
+                            <p>You're already logged in. Visit your <a href="/profile/">profile</a> to manage your account.</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="ui raised segment">
+                        <h2 class="ui header">
+                            <i class="sign in icon"></i>
+                            <div class="content">
+                                Login
+                                <div class="sub header">Sign in to your account</div>
+                            </div>
+                        </h2>
+                        <div class="ui divider"></div>
+                        <form method="POST" class="ui form">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="ui primary fluid button">
+                                <i class="sign in icon"></i>
+                                Login
+                            </button>
+                        </form>
+                        <div class="ui horizontal divider" style="margin-top: 20px; margin-bottom: 20px;">OR</div>
+                        <div class="ui center aligned segment" style="background: transparent; border: none; box-shadow: none;">
+                            <p>Don't have an account?</p>
+                            <a href="/signup/" class="ui button">
+                                <i class="user plus icon"></i>
+                                Sign Up
+                            </a>
+                            <div class="ui divider" style="margin-top: 15px; margin-bottom: 15px;"></div>
+                            <a href="{% url 'password_reset' %}" class="ui basic button">
+                                <i class="key icon"></i>
+                                Forgot Password?
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

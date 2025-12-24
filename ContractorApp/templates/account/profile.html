@@ -1,38 +1,117 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-<h4 class="ui secondary block header">
-  <div class="ui orange basic label">
-    Find.Contractors
-  </div>
-  <a href="/profile/" class="ui button">My Account</a>
-  {% if query %}
-    <a href="/jobs/create/" class="ui standard button">Post a New Job Opening</a>
-  {% endif %}
-    <a href="/logout/" class="ui standard button">Sign Out</a>
-</h4>
-{% if user.is_authenticated %}
-    {% for item in context %}
-        <div class="ui placeholder segment">
-            <div class="ui header">
-                <center>
-                    {{ request.user|escape }}<br />
-                    {{ item.about_me|escape }}<br />
-                    {{ item.experience|escape|linebreaks }}<br />
-                </center>
-                <div class="inline">
-                    <a href="/update_profile/" class="ui primary button">Update Profile</a>
-                </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Find.Contractors</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <style>
+        body { background-color: #f5f5f5; }
+        .main-container { min-height: 80vh; padding-top: 20px; padding-bottom: 60px; }
+    </style>
+</head>
+<body>
+    <div class="ui inverted menu">
+        <div class="ui container">
+            <a href="/" class="header item">
+                <i class="users icon"></i>
+                Find.Contractors
+            </a>
+            <div class="right menu">
+                <a href="/profile/" class="item active"><i class="user icon"></i> My Account</a>
+                {% if query %}
+                    <a href="/jobs/create/" class="item"><i class="plus icon"></i> Post a New Job</a>
+                {% endif %}
+                <a href="/logout/" class="item"><i class="sign out icon"></i> Sign Out</a>
             </div>
         </div>
-    {% endfor %}
-    {% if query %}
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}<br />
-            <button type="submit">Delete Selected Job</button><br />
-        </form>
-    {% endif %}
-    {% for job in jobs_listed %}
-        {{ job.title|escape }}<br />
-    {% endfor %}
-{% endif %}
+    </div>
+
+    <div class="ui container main-container">
+        {% if user.is_authenticated %}
+            <h2 class="ui header">
+                <i class="user circle icon"></i>
+                <div class="content">
+                    My Profile
+                    <div class="sub header">View and manage your account information</div>
+                </div>
+            </h2>
+            <div class="ui divider"></div>
+
+            {% for item in context %}
+                <div class="ui raised card" style="width: 100%; margin-bottom: 20px;">
+                    <div class="content">
+                        <div class="header">
+                            <i class="user icon"></i>
+                            {{ request.user|escape }}
+                        </div>
+                        <div class="meta">
+                            <span>Profile Information</span>
+                        </div>
+                        <div class="description">
+                            <div class="ui relaxed list">
+                                <div class="item">
+                                    <i class="info circle icon"></i>
+                                    <div class="content">
+                                        <div class="header">About Me</div>
+                                        <div class="description">{{ item.about_me|escape }}</div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <i class="briefcase icon"></i>
+                                    <div class="content">
+                                        <div class="header">Experience</div>
+                                        <div class="description">{{ item.experience|escape|linebreaks }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="extra content">
+                        <a href="/update_profile/" class="ui primary button">
+                            <i class="edit icon"></i>
+                            Update Profile
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if query %}
+                <div class="ui segment">
+                    <h3 class="ui header">
+                        <i class="trash icon"></i>
+                        Manage Jobs
+                    </h3>
+                    <form method="POST" class="ui form">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="ui red button">
+                            <i class="trash icon"></i>
+                            Delete Selected Job
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+            {% if jobs_listed %}
+                <h3 class="ui header">
+                    <i class="list icon"></i>
+                    My Posted Jobs
+                </h3>
+                <div class="ui relaxed divided list">
+                    {% for job in jobs_listed %}
+                        <div class="item">
+                            <i class="briefcase icon"></i>
+                            <div class="content">
+                                <div class="header">{{ job.title|escape }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
