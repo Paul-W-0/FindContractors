@@ -82,8 +82,8 @@ def signup_company_finish(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/')
-@csrf_protect
 @login_required
+@csrf_protect
 def profile(request):
     try:
         query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
@@ -93,12 +93,14 @@ def profile(request):
             form = DeleteJobForm(request.POST, request=request)
             if form.is_valid():
                 job_title = form.cleaned_data.get('title')
-                job_query = Job.objects.filter(employer=request.user, title=job_title).first()
-                if job_query:
+                try:
+                    job_query = Job.objects.filter(employer=request.user, title=job_title).get()
                     job_query.delete()
                     return HttpResponse('The job you selected has been deleted.')
-                else:
+                except Job.DoesNotExist:
                     return HttpResponse('Job not found.')
+                except Job.MultipleObjectsReturned:
+                    return HttpResponse('Multiple jobs with that title found. Please contact support.')
             else:
                 return HttpResponse('Invalid form submission.')
         else:
