@@ -8,8 +8,8 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.core import mail
 from django.db import IntegrityError
-@csrf_protect
 @login_required
+@csrf_protect
 def home(request):
     if request.user.is_superuser == True or request.user.is_staff == True:
         return HttpResponseRedirect('/security/reports/')
@@ -109,8 +109,8 @@ def profile(request):
     except Contractor.DoesNotExist:
         context = Profile.objects.filter(user=request.user)
         return render(request, 'account/profile.html', { 'context':context, } )
-@csrf_protect
 @login_required
+@csrf_protect
 def setup_profile(request):
     obj = Profile.objects.filter(user=request.user)
     if obj.exists():
@@ -128,8 +128,8 @@ def setup_profile(request):
         else:
             form = ProfileSetup()
             return render(request, 'account/profile_setup.html', { 'form':form } )
-@csrf_protect
 @login_required
+@csrf_protect
 def update_profile(request):
     if request.method == 'POST':
         obj = Profile.objects.get(user=request.user)
@@ -143,8 +143,8 @@ def update_profile(request):
     else:
         form = ProfileSetup()
         return render(request, 'account/update_profile.html', { 'form':form } )
-@csrf_protect
 @login_required
+@csrf_protect
 def job_create(request):
     try:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
@@ -171,8 +171,8 @@ def job_create(request):
     except Contractor.DoesNotExist:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=True):
             return HttpResponseForbidden()
-@csrf_protect
 @login_required
+@csrf_protect
 def report_security_problem(request):
     if request.method == 'POST':
         form = SecurityReportForm(request.POST)
@@ -202,8 +202,8 @@ def reports(request):
         return render(request, 'security_reports.html', { 'context':context, } )
     else:
         return HttpResponseForbidden()
-@csrf_protect
 @login_required
+@csrf_protect
 def job_apply(request, slug):
     try:
         if Contractor.objects.filter(user=request.user).get(is_a_contractor=False):
