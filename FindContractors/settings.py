@@ -62,6 +62,13 @@ SESSION_COOKIE_SECURE = not DEBUG  # Use secure cookies in production
 SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookies
 CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF token
 
+# Additional production security settings
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
 ROOT_URLCONF = 'FindContractors.urls'
 
 TEMPLATES = [

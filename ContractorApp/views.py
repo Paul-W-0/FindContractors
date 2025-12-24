@@ -40,8 +40,8 @@ def home(request):
 def signup(request):
     if request.method == 'POST':
         form = UserTypeForm(request.POST)
-        if form.is_bound: # Using is_bound() here instead of is_valid because theres no need to save the form.
-            user_choice = request.POST.get('choice_type') # Refer to the UserTypeForm class in forms.py for information.
+        if form.is_valid():
+            user_choice = form.cleaned_data.get('choice_type')
             if user_choice == '1':
                 return HttpResponseRedirect('/signup_contractor_finish/')
             elif user_choice == '2':
