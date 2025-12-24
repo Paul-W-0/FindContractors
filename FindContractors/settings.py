@@ -21,12 +21,14 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--$j7p50(rkfbyz^7cwevlany0@wni!swuvt=rj!tk453spcl5)'
+# For production, set this via environment variable
+import os
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure--$j7p50(rkfbyz^7cwevlany0@wni!swuvt=rj!tk453spcl5)')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if host.strip()]
 
 
 # Application definition
@@ -50,6 +52,22 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_SECURE = not DEBUG  # Use secure cookies in production
+SESSION_COOKIE_SECURE = not DEBUG  # Use secure cookies in production
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookies
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF token
+
+# Additional production security settings
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 ROOT_URLCONF = 'FindContractors.urls'
 

@@ -40,8 +40,8 @@ def home(request):
 def signup(request):
     if request.method == 'POST':
         form = UserTypeForm(request.POST)
-        if form.is_bound: # Using is_bound() here instead of is_valid because theres no need to save the form.
-            user_choice = request.POST.get('choice_type') # Refer to the UserTypeForm class in forms.py for information.
+        if form.is_valid():
+            user_choice = form.cleaned_data.get('choice_type')
             if user_choice == '1':
                 return HttpResponseRedirect('/signup_contractor_finish/')
             elif user_choice == '2':
@@ -58,10 +58,8 @@ def signup_contractor_finish(request):
     if request.method == 'POST':
         signup_form = ContractorSignUpForm(request.POST)
         if signup_form.is_valid():
-            save_form = signup_form.save()
-            save_form.save()
-            get_user = User.objects.all().last()
-            Contractor.objects.create(user=get_user, is_a_contractor=True)
+            new_user = signup_form.save()
+            Contractor.objects.create(user=new_user, is_a_contractor=True)
             return HttpResponseRedirect('/login/')
         else:
             return HttpResponse('We encountered a problem when processing your request, please check you information and try again.')
@@ -73,10 +71,8 @@ def signup_company_finish(request):
     if request.method == 'POST':
         signup_form = WorkSignUpForm(request.POST)
         if signup_form.is_valid():
-            save_form = signup_form.save()
-            save_form.save()
-            get_user = User.objects.all().last()
-            Contractor.objects.create(user=get_user, is_a_contractor=False) # Assign the newest user in the database to either be a Contractor or Company.
+            new_user = signup_form.save()
+            Contractor.objects.create(user=new_user, is_a_contractor=False) # Assign the newest user in the database to either be a Contractor or Company.
             return HttpResponseRedirect('/login/')
         else:
             return HttpResponse('We encountered a problem when processing your request, please check your information and try again.')
@@ -87,6 +83,7 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/')
 @login_required
+@csrf_protect
 def profile(request):
     try:
         query = Contractor.objects.filter(user=request.user).get(is_a_contractor=False)
@@ -94,9 +91,18 @@ def profile(request):
         jobs_listed = Job.objects.all().filter(employer=request.user)
         if request.method == "POST":
             form = DeleteJobForm(request.POST, request=request)
-            job_query = Job.objects.filter(employer=request.user).get(title=request.POST.get('title'))
-            job_query.delete()
-            return HttpResponse('The job you selected has been deleted.')
+            if form.is_valid():
+                job_title = form.cleaned_data.get('title')
+                try:
+                    job_query = Job.objects.filter(employer=request.user, title=job_title).get()
+                    job_query.delete()
+                    return HttpResponse('The job you selected has been deleted.')
+                except Job.DoesNotExist:
+                    return HttpResponse('Job not found.')
+                except Job.MultipleObjectsReturned:
+                    return HttpResponse('Multiple jobs with that title found. Please contact support.')
+            else:
+                return HttpResponse('Invalid form submission.')
         else:
             form = DeleteJobForm(request=request)
             return render(request, 'account/profile.html', { 'context':context, 'query':query, 'jobs_listed':jobs_listed, 'form':form, } )

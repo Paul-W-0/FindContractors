@@ -14,9 +14,9 @@
   {% for jobcontext in jobcontext %}
     <div class="ui primary message">
       <div class="header">
-          <a href="{% url 'job_apply' jobcontext.slug %}">{{ jobcontext.title }}</a>
+          <a href="{% url 'job_apply' jobcontext.slug %}">{{ jobcontext.title|escape }}</a>
       </div>
-      {{ jobcontext.work_duties }}
+      {{ jobcontext.work_duties|escape }}
     </div>
   {% endfor %}
 {% endif %}
@@ -26,7 +26,7 @@
     {{ form.as_p }}<br />
     <button type="submit">Select this User</button><br />
   {% for job in job_query %}
-    {{ job.contractor_name }}
-    {{ job.contractor_experience }}
+    {{ job.contractor_name|escape }}
+    {{ job.contractor_experience|escape }}
   {% endfor %}
 {% endif %}

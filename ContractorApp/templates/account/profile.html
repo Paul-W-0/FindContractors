@@ -15,9 +15,9 @@
         <div class="ui placeholder segment">
             <div class="ui header">
                 <center>
-                    {{ request.user }}<br />
-                    {{ item.about_me }}<br />
-                    {{ item.experience }}<br />
+                    {{ request.user|escape }}<br />
+                    {{ item.about_me|escape }}<br />
+                    {{ item.experience|escape|linebreaks }}<br />
                 </center>
                 <div class="inline">
                     <a href="/update_profile/" class="ui primary button">Update Profile</a>
@@ -33,6 +33,6 @@
         </form>
     {% endif %}
     {% for job in jobs_listed %}
-        {{ job.title }}<br />
+        {{ job.title|escape }}<br />
     {% endfor %}
 {% endif %}
