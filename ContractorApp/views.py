@@ -58,10 +58,8 @@ def signup_contractor_finish(request):
     if request.method == 'POST':
         signup_form = ContractorSignUpForm(request.POST)
         if signup_form.is_valid():
-            save_form = signup_form.save()
-            save_form.save()
-            get_user = User.objects.all().last()
-            Contractor.objects.create(user=get_user, is_a_contractor=True)
+            new_user = signup_form.save()
+            Contractor.objects.create(user=new_user, is_a_contractor=True)
             return HttpResponseRedirect('/login/')
         else:
             return HttpResponse('We encountered a problem when processing your request, please check you information and try again.')
@@ -73,10 +71,8 @@ def signup_company_finish(request):
     if request.method == 'POST':
         signup_form = WorkSignUpForm(request.POST)
         if signup_form.is_valid():
-            save_form = signup_form.save()
-            save_form.save()
-            get_user = User.objects.all().last()
-            Contractor.objects.create(user=get_user, is_a_contractor=False) # Assign the newest user in the database to either be a Contractor or Company.
+            new_user = signup_form.save()
+            Contractor.objects.create(user=new_user, is_a_contractor=False) # Assign the newest user in the database to either be a Contractor or Company.
             return HttpResponseRedirect('/login/')
         else:
             return HttpResponse('We encountered a problem when processing your request, please check your information and try again.')
@@ -86,6 +82,7 @@ def signup_company_finish(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/login/')
+@csrf_protect
 @login_required
 def profile(request):
     try:
@@ -94,9 +91,16 @@ def profile(request):
         jobs_listed = Job.objects.all().filter(employer=request.user)
         if request.method == "POST":
             form = DeleteJobForm(request.POST, request=request)
-            job_query = Job.objects.filter(employer=request.user).get(title=request.POST.get('title'))
-            job_query.delete()
-            return HttpResponse('The job you selected has been deleted.')
+            if form.is_valid():
+                job_title = form.cleaned_data.get('title')
+                job_query = Job.objects.filter(employer=request.user, title=job_title).first()
+                if job_query:
+                    job_query.delete()
+                    return HttpResponse('The job you selected has been deleted.')
+                else:
+                    return HttpResponse('Job not found.')
+            else:
+                return HttpResponse('Invalid form submission.')
         else:
             form = DeleteJobForm(request=request)
             return render(request, 'account/profile.html', { 'context':context, 'query':query, 'jobs_listed':jobs_listed, 'form':form, } )

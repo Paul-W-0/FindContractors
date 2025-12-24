@@ -11,8 +11,10 @@
     <a href="/logout/" class="ui standard button">Sign Out</a>
 </h4>
 {% for report in context %}
-{{ report.title }}
-{{ report.description }}
-{{ report.explanation }}
-{{ report.steps_to_reproduce }}
+<div class="ui segment">
+  <h3>{{ report.title|escape }}</h3>
+  <p><strong>Description:</strong> {{ report.description|escape }}</p>
+  <p><strong>Explanation:</strong> {{ report.explanation|escape }}</p>
+  <p><strong>Steps to Reproduce:</strong> {{ report.steps_to_reproduce|escape|linebreaks }}</p>
+</div>
 {% endfor %}
